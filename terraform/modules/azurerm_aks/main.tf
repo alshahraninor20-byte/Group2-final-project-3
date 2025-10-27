@@ -38,7 +38,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "user_pool" {
   node_count            = 1
   min_count             = 1
   max_count             = 2
-  # Ignore node_count value when auto scaling is on 
+  # Ignore node_count value when auto scaling is on
   lifecycle {
     ignore_changes = [
       node_count
