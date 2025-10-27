@@ -31,3 +31,12 @@ module "aks" {
   resource_group_name = module.resource_group.resource_group
   aks_subnet_id       = module.subnets["aks_subnet"].id
 }
+
+module "key_vault" {
+  source               = "./modules/azurerm_vault"
+  name                 = "group2-kv"
+  location             = local.location
+  resource_group_name  = module.resource_group.resource_group
+  subnet_ids           = [module.subnets["aks_subnet"].id]
+  aksp_id              = module.aks.aks_managed_identity
+}
