@@ -1,56 +1,43 @@
-# 🧩 Group2 Final Project 3
-
-This repository contains the full DevOps project structure for **Group 2**, built following a complete cloud-native CI/CD architecture using **Azure Kubernetes Service (AKS)**, **Terraform**, **GitHub Actions**, and **Docker**.
-
----
-
-## 🧱 Project Structure
-
-```bash
-.github/
+Group2-final-project-3/
 │
-└── workflows/
-    ├── infra-pipeline.yml        # CI/CD for infrastructure (Terraform + Ansible)
-    ├── k8s-pipeline.yml          # CI/CD for Kubernetes deployments
-    ├── frontend-pipeline.yml     # CI/CD for React frontend build & deploy
-    └── backend-pipeline.yml      # CI/CD for Spring Boot backend build & deploy
-
-infra/
+├── .github/
+│   └── workflows/
+│       ├── backend-pipeline.yml
+│       ├── frontend-pipeline.yml
+│       ├── k8s-pipeline.yml
+│       └── infra-pipeline.yml
 │
-├── terraform/                   # IaC for Azure resources (AKS, SQL, VNet, etc.)
-│   ├── main.tf
-│   ├── variables.tf
-│   └── outputs.tf
+├── app/
+│   ├── frontend/
+│   │   ├── src/
+│   │   ├── public/
+│   │   ├── package.json
+│   │   ├── vite.config.ts
+│   │   └── Dockerfile
+│   │
+│   └── backend/
+│       ├── src/
+│       ├── pom.xml
+│       └── Dockerfile
 │
-└── ansible/                     # Configuration management and provisioning
-    └── playbook.yml
-
-k8s/
+├── k8s/
+│   ├── backend-deployment.yaml     # Backend placeholder
+│   └── frontend-deployment.yaml    # Frontend placeholder
 │
-├── deployments/                 # Pod deployments for frontend and backend
-│   ├── frontend-deployment.yaml
-│   └── backend-deployment.yaml
+├── terraform/
+│   ├── main.tf                     # Terraform main configuration file
+│   └── variables.tf                # Terraform variables file
 │
-├── services/                    # Service exposures within cluster
-│   ├── frontend-service.yaml
-│   └── backend-service.yaml
+├── docs/
+│   ├── architecture-diagram.png
+│   └── README.md
 │
-├── ingress/                     # Ingress controller or Application Gateway rules
-│   └── ingress.yaml
-│
-├── secrets/                     # Kubernetes secrets and configurations
-│   └── app-secrets.yaml
+├── env/
+│   ├── environment.env
+│   └── environment.env.example
 │
 └── README.md
 
-frontend/
-│
-├── src/                         # React + TypeScript source code
-├── public/
-├── package.json
-├── vite.config.ts
-├── Dockerfile                   # Frontend Docker build image
-└── README.md
 
 backend/
 │
