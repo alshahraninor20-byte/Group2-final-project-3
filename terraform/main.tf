@@ -21,3 +21,5 @@ module "subnets" {
   vnet_name           = module.virtual_network.virtual_network
   address_prefixes    = each.value.address_space
 }
+
+
