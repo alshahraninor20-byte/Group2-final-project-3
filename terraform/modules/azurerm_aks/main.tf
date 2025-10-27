@@ -8,7 +8,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   default_node_pool {
     name                 = var.default_node_pool_name
-    node_count           = 1
+    node_count           = 2
     vm_size              = var.vm_size
     vnet_subnet_id       = var.aks_subnet_id
     type                 = "VirtualMachineScaleSets"
@@ -26,7 +26,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     load_balancer_sku = "standard"
   }
 
-  role_based_access_control_enabled = true
+  # role_based_access_control_enabled = true
 
 }
 
@@ -35,9 +35,9 @@ resource "azurerm_kubernetes_cluster_node_pool" "user_pool" {
   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
   vm_size               = var.vm_size
   auto_scaling_enabled = true
-  node_count            = 2
-  min_count             = 2
-  max_count             = 3
+  node_count            = 1
+  min_count             = 1
+  max_count             = 2
   # Ignore node_count value when auto scaling is on 
   lifecycle {
     ignore_changes = [
