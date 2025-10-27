@@ -14,11 +14,6 @@ output "db_username" {
   value = azurerm_mssql_server.main.administrator_login
 }
 
-output "db_password" {
-  value     = var.admin_password
-  sensitive = true
-}
-
 output "sql_private_ip" {
   value = azurerm_private_endpoint.sql_private_ep.private_service_connection[0].private_ip_address
 }
