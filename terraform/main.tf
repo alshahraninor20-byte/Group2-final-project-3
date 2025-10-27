@@ -17,9 +17,10 @@ module "subnets" {
   source              = "./modules/azurerm_subnets"
   for_each            = local.subnet
   name                = each.key
-  resource_group_name = local.resource_group_name
+  resource_group_name = module.resource_group.resource_group
   vnet_name           = module.virtual_network.virtual_network
   address_prefixes    = each.value.address_space
 }
+
 
 
