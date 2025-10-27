@@ -22,6 +22,17 @@ module "subnets" {
   address_prefixes    = each.value.address_space
 }
 
+module "sql" {
+  source              = "./modules/azurerm_sql"
+  resource_group_name = module.resource_group.resource_group
+  location            = local.location
+  db_name             = "project3"
+  admin_login         = var.admin_user
+  admin_password      = var.admin_password
+  subnet_id           = module.subnets["db_subnet"].id
+  vnet_id             = module.virtual_network.virtual_network_id
+}
+
 module "aks" {
   source              = "./modules/azurerm_aks" 
   prefix              = "group2"
