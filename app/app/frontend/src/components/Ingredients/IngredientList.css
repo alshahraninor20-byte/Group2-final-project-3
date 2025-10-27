@@ -1,0 +1,41 @@
+.ingredient-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.ingredient-category {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.category-title {
+  color: #333;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  text-transform: capitalize;
+}
+
+.ingredient-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .ingredient-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+  }
+
+  .category-title {
+    font-size: 1.3rem;
+  }
+
+  .ingredient-category {
+    padding: 1rem;
+  }
+}
+

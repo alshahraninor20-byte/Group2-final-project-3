@@ -1,0 +1,125 @@
+.burger-preview {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 100px;
+}
+
+.preview-title {
+  text-align: center;
+  color: #333;
+  font-size: 1.8rem;
+  margin: 0 0 1.5rem 0;
+  font-weight: 700;
+}
+
+.burger-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 200px;
+}
+
+.burger-top-bun,
+.burger-bottom-bun {
+  background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.empty-burger {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  color: #999;
+  text-align: center;
+}
+
+.empty-burger p {
+  margin: 0.25rem 0;
+}
+
+.hint {
+  font-size: 0.9rem;
+  color: #bbb;
+}
+
+.burger-layer {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.burger-layer:hover {
+  background: #fee;
+  border-color: #f66;
+  transform: translateX(4px);
+}
+
+.burger-layer.patty {
+  background: linear-gradient(135deg, #8b4513 0%, #654321 100%);
+  color: white;
+  border-color: #654321;
+}
+
+.burger-layer.bun {
+  background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+  color: white;
+  border-color: #fda085;
+}
+
+.burger-layer.topping {
+  background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+  color: white;
+  border-color: #8fd3f4;
+}
+
+.burger-layer.sauce {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  color: white;
+  border-color: #fee140;
+}
+
+.layer-icon {
+  font-size: 1.5rem;
+}
+
+.layer-name {
+  flex: 1;
+  font-weight: 600;
+}
+
+.layer-quantity {
+  background: rgba(255, 255, 255, 0.3);
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .burger-preview {
+    position: static;
+    margin-bottom: 2rem;
+  }
+
+  .preview-title {
+    font-size: 1.5rem;
+  }
+}
+
