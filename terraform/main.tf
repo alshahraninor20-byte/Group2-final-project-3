@@ -21,3 +21,13 @@ module "subnets" {
   vnet_name           = module.virtual_network.virtual_network
   address_prefixes    = each.value.address_space
 }
+
+module "aks" {
+  source              = "./modules/azurerm_aks" 
+  prefix              = "group2"
+  location            = local.location
+  vm_size             = "Standard_B2s"
+  default_node_pool_name = "nodepool"
+  resource_group_name = module.resource_group.resource_group
+  aks_subnet_id       = module.subnets["aks_subnet"].id
+}
