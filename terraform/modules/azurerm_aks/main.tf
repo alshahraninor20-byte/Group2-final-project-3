@@ -8,9 +8,9 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   default_node_pool {
     name                 = var.default_node_pool_name
-    node_count           = 2
+    node_count           = 1
     vm_size              = var.vm_size
-    vnet_subnet_id       = var.aks_subnet_id
+    vnet_subnet_id       = var.aks_subnet_id # run it inside aks_subent
     type                 = "VirtualMachineScaleSets"
   }
 
@@ -33,6 +33,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
 resource "azurerm_kubernetes_cluster_node_pool" "user_pool" {
   name                  = "userpool"
   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
+  vnet_subnet_id = var.aks_subnet_id # assigning the node pool to a specific subnet
   vm_size               = var.vm_size
   auto_scaling_enabled = true
   node_count            = 1
