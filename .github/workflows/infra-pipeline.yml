@@ -43,24 +43,18 @@ jobs:
         run: terraform validate
 
       - name: Plan the changes
-        env:
-          ADMIN_USER: ${{ secrets.ADMIN_USER }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
         run: |
           terraform plan \
-            -var="admin_user=${{ secrets.ADMIN_USER }}" \
-            -var="admin_password=${{ secrets.ADMIN_PASSWORD }}" \
+            -var="admin_user=sqladmin" \
+            -var="admin_password=Admin@12345" \
             -out=tfplan
 
-
       - name: Apply changes
-        env:
-          ADMIN_USER: ${{ secrets.ADMIN_USER }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
           terraform apply \
-            -var="admin_user=${{ secrets.ADMIN_USER }}" \
-            -var="admin_password=${{ secrets.ADMIN_PASSWORD }}" \
+            -var="admin_user=sqladmin" \
+            -var="admin_password=Admin@12345" \
             -auto-approve tfplan
 
       - name: Get AKS credentials
