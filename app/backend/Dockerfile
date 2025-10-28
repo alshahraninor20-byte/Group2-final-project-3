@@ -5,6 +5,7 @@ WORKDIR /app
 
 # Copy only pom first for caching
 COPY pom.xml .
+
 # Copy the source code
 COPY src ./src
 
@@ -22,4 +23,5 @@ COPY --from=build /app/target/*.jar app.jar
 EXPOSE 80
 
 CMD ["java", "-jar", "app.jar"]
+
 

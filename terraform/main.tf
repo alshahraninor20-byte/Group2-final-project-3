@@ -15,11 +15,8 @@ module "virtual_network" {
 
 module "subnets" {
   source              = "./modules/azurerm_subnets"
-  for_each            = local.subnet
-  name                = each.key
   resource_group_name = module.resource_group.resource_group
   vnet_name           = module.virtual_network.virtual_network
-  address_prefixes    = each.value.address_space
 }
 
 module "sql" {
@@ -29,16 +26,16 @@ module "sql" {
   db_name             = "project3"
   admin_login         = var.admin_user
   admin_password      = var.admin_password
-  subnet_id           = module.subnets["db_subnet"].id
+  subnet_id           = module.subnets.subnets["db_subnet"]
   vnet_id             = module.virtual_network.virtual_network_id
 }
 
 module "aks" {
-  source              = "./modules/azurerm_aks" 
-  prefix              = "group2"
-  location            = local.location
-  vm_size             = "Standard_B2s"
-  default_node_pool_name = "nodepool"
-  resource_group_name = module.resource_group.resource_group
-  aks_subnet_id       = module.subnets["aks_subnet"].id
+  source                  = "./modules/azurerm_aks"
+  prefix                  = "group2"
+  location                = local.location
+  vm_size                 = "Standard_B2s"
+  default_node_pool_name  = "nodepool"
+  resource_group_name     = module.resource_group.resource_group
+  aks_subnet_id           = module.subnets.subnets["aks_subnet"]
 }
