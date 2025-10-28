@@ -24,8 +24,4 @@ variable "subnet_ids" {
   description = "Subnets allowed to access the vault"
 }
 
-variable "aksp_id" {
-  type        = string
-  description = "AKS Managed Identity Object ID for access"
-}
 
