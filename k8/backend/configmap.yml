@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: my-namespace
+data:
+  DB_HOST: "project3-server-group2.database.windows.net"
+  DB_PORT: "1433"
+  DB_NAME: "project3-db"
