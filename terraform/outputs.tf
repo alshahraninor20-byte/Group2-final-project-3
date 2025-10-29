@@ -16,3 +16,8 @@ output "kv_uri" {
   description = "Key Vault URI"
   value       = module.key_vault.key_vault_uri
 }
+
+output "key_vault_name" {
+  description = "Key Vault name"
+  value       = module.key_vault.key_vault_name
+}
