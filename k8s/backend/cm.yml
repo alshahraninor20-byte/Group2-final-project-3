@@ -4,8 +4,10 @@ metadata:
   name: dbconfig
   namespace: project3
 data:
-  DB_HOST: "khalid-db-sqlsrv.database.windows.net"
+  DB_HOST: khalid-db-sqlsrv.database.windows.net
   DB_PORT: "1433"
   DB_NAME: "khalid-db-db"
   DB_ENCRYPT: "true"
-  DB_DRIVER: "com.microsoft.sqlserver.jdbc.SQLServerDriver"
+  DB_DRIVER: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  SPRING_PROFILES_ACTIVE: azure
+  SERVER_PORT: "8080"
