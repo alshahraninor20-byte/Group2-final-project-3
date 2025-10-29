@@ -18,6 +18,8 @@ spec:
       containers:
         - image: ferhadmab/backend-burger-app:latest
           name: backend-burger-app
+          ports:
+            - containerPort: 80
           envFrom:
             - configMapRef:
                 name: backend-config
