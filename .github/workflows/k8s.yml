@@ -53,7 +53,7 @@ jobs:
 
       - name: deploy k8s backend
         run: |
-          kubectl apply -f deployment.yml -f service.yml -f ingress.yml
+          kubectl apply -f cm.yml -f deployment.yml -f service.yml -f ingress.yml
         working-directory: k8s/backend
 
       - name: deploy k8s frontend
