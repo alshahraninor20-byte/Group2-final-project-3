@@ -54,14 +54,7 @@ jobs:
 
       - name: Apply changes
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        env:
-          ADMIN_USER: ${{ secrets.ADMIN_USER }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-        run: |
-          terraform apply \
-            -var="admin_user=${{ secrets.ADMIN_USER }}" \
-            -var="admin_password=${{ secrets.ADMIN_PASSWORD }}" \
-            -auto-approve tfplan
+        run: terraform apply -auto-approve tfplan
 
       - name: Get AKS credentials
         if: ${{ github.event_name == 'workflow_dispatch' }}
