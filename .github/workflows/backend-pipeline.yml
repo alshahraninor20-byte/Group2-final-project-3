@@ -1,7 +1,7 @@
 name: build and deploy backend
 
 on:
-  push:
+  pull_request:
     branches:
       - main
 
