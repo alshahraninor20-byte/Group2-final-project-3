@@ -40,11 +40,18 @@ jobs:
         run: terraform validate
 
       - name: Plan the changes
-        run: terraform plan -out=tfplan
+        env:
+          ADMIN_USER: ${{ secrets.ADMIN_USER }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        run: |
+          terraform plan \
+            -var="admin_user=${{ secrets.ADMIN_USER }}" \
+            -var="admin_password=${{ secrets.ADMIN_PASSWORD }}" \
+            -out=tfplan
 
       - name: Apply changes
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: terraform apply --auto-approve tfplan
+        run: terraform apply -auto-approve tfplan
 
       - name: Get AKS credentials
         if: ${{ github.event_name == 'workflow_dispatch' }}
@@ -53,17 +60,6 @@ jobs:
             --resource-group $(terraform output -raw rg) \
             --name $(terraform output -raw cluster_name) \
             --overwrite-existing
-
-      - name: Apply Prometheus ClusterRole
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: kubectl apply -f rbac-prometheus-clusterrole.yaml
-        working-directory: k8s
-
-      - name: Apply Prometheus ClusterRoleBinding
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: kubectl apply -f rbac-prometheus-clusterrolebinding.yaml
-        working-directory: k8s
-
 
       - name: Verify kubectl connection
         if: ${{ github.event_name == 'workflow_dispatch' }}
@@ -112,7 +108,7 @@ jobs:
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
           echo "Waiting 60s for Prometheus, Grafana, and Loki to start..."
-          sleep 90
+          sleep 60
 
       - name: Add Loki Data Source to Grafana
         if: ${{ github.event_name == 'workflow_dispatch' }}
