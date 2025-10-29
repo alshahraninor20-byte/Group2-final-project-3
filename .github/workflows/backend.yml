@@ -82,7 +82,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         run: |
           kubectl create -n project3 secret generic my-secret \
-            --from-literal=DB_USER=${{ secrets.ADMIN_USER }} \
+            --from-literal=DB_USERNAME=${{ secrets.ADMIN_USER }} \
             --from-literal=DB_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
 
       - name: Update K8s deployment with SHA image
