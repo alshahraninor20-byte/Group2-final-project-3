@@ -1,0 +1,32 @@
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+*.tmp
+*.temp
+
+**/**/.terraform/
+**/**/.terraform.lock.hcl
+**/**/*.tfstate
+**/**/target/
+terraform.tfstate.backup
+.terraform.tfstate.lock.info
+
+bootstrap

@@ -1,32 +1,23 @@
 variable "prefix" {
-  
-}
-
-variable "vm_size" {
-
-    default = "Standard_B2s"
-  
+  type = string
 }
 
 variable "default_node_pool_name" {
-  
+  type = string
+}   
+
+variable "vm_size" {
+
 }
 
 variable "resource_group_name" {
-  description = "Resource group for the private DNS zone"
-  type        = string
-}
+  type = string
+}   
 
 variable "location" {
-  description = "Azure region"
-  type        = string
+  type = string
 }
 
-variable "aks_subnet_id" {
-  description = "AKS subnet ID"
-  type        = string
+variable "subnet" {
+  
 }
-
-
-
-

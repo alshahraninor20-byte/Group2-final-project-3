@@ -1,10 +1,18 @@
-variable "resource_group_name" {}
-variable "location" {}
-variable "db_name" {}
-variable "admin_login" {}
-variable "admin_password" {
-  sensitive = true
+variable "resource_group_name" {
+    type = string
 }
-variable "subnet_id" {}
-variable "vnet_id" {
+variable "location" {
+    type = string
+}
+variable "db_name" {
+    type = string
+}
+
+variable "admin_login" {
+    type = string
+}
+
+variable "admin_password" {
+    type = string
+  sensitive = true
 }

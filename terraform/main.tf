@@ -1,44 +1,52 @@
-module "resource_group" {
-  source                 = "./modules/azurerm_resource_group"
-  name                   = local.resource_group_name
-  location               = local.location
+resource "azurerm_resource_group" "rg" {
+  name     = local.resource_group_name
+  location = local.location
 }
 
-module "virtual_network" {
+module "vnet" {
   source              = "./modules/azurerm_vnet"
-  name                = local.vnet_name
-  address_space       = local.address_space
-  resource_group_name = module.resource_group.resource_group
+  vnet_name           = local.vnet_name
+  resource_group_name = azurerm_resource_group.rg.name
   location            = local.location
+  address_space       = local.address_space
 }
-
 
 module "subnets" {
   source              = "./modules/azurerm_subnets"
   for_each            = local.subnet
   name                = each.key
-  resource_group_name = module.resource_group.resource_group
-  vnet_name           = module.virtual_network.virtual_network
+  resource_group_name = azurerm_resource_group.rg.name
+  vnet_name           = module.vnet.virtual_network
   address_prefixes    = each.value.address_space
 }
 
 module "sql" {
   source              = "./modules/azurerm_sql"
-  resource_group_name = module.resource_group.resource_group
+  resource_group_name = azurerm_resource_group.rg.name
   location            = local.location
-  db_name             = "project3"
+  db_name             = "group2-project3-db"
   admin_login         = var.admin_user
   admin_password      = var.admin_password
+
+}
+
+module "pri" {
+  source              = "./modules/azurerm_privatelink"
+  location            = local.location
+  resource_group_name = azurerm_resource_group.rg.name
+  db_name             = module.sql.db_name
   subnet_id           = module.subnets["db_subnet"].id
-  vnet_id             = module.virtual_network.virtual_network_id
+  vnet_id             = module.vnet.virtual_network_id
+  admin_login         = var.admin_user
+  mssql_server        = lower(module.sql.mssql_server)
 }
 
 module "aks" {
-  source              = "./modules/azurerm_aks" 
-  prefix              = "group2"
-  location            = local.location
-  vm_size             = "Standard_B2s"
-  default_node_pool_name = "nodepool"
-  resource_group_name = module.resource_group.resource_group
-  aks_subnet_id       = module.subnets["aks_subnet"].id
+  source                 = "./modules/azurerm_aks"
+  prefix                 = "group2-project"
+  location               = local.location
+  resource_group_name    = azurerm_resource_group.rg.name
+  default_node_pool_name = "kha"
+  vm_size                = "Standard_A2_v2"
+  subnet                 = module.subnets["aks_subnet"].id
 }
