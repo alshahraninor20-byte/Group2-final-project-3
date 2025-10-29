@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: burger-app-backend
+  namespace: project3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: burger-app-backend
+  template:
+    metadata:
+      labels:
+        app: burger-app-backend
+    spec:
+      containers:
+      - name: burger-app-backend
+        image: khalidharbi/test-back-project2:latest
+        ports:
+          - containerPort: 8080
+        envFrom:
+          - configMapRef:
+              name: dbconfig         # your ConfigMap with DB_HOST, DB_PORT, DB_NAME, DB_DRIVER
+          - secretRef:
+              name: my-secret        # secret with DB_USERNAME, DB_PASSWORD
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 90
+          periodSeconds: 20
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+        startupProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          failureThreshold: 30
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
