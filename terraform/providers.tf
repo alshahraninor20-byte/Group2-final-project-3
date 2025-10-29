@@ -8,7 +8,7 @@ terraform {
 
     backend "azurerm" {
    resource_group_name = "khalid-rg-tfstate"
-   storage_account_name = "khalidstorage0sf7rp"
+   storage_account_name = "khalidstoragey7bkpi"
    container_name = "tfstate"
    key = "terraform.tfstate"
   }
