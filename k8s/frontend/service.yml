@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: frontend-clusterip-service
+  name: frontend-svc
   namespace: project3
 spec:
-  type: ClusterIP
-  selector:
-    app: frontend-app
   ports:
-    - port: 80
-      targetPort: 80
+  - port: 80
+    targetPort: 80
+  selector:
+    app: burger-app-frontend
+
