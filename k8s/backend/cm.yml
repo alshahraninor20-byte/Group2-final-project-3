@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dbconfig
+data:
+  DB_HOST: "khalid-db-sqlsrv.database.windows.net"
+  DB_PORT: "1433"
+  DB_NAME: "khalid-db-db"
+  DB_ENCRYPT: "true"
+  DB_DRIVER: "com.microsoft.sqlserver.jdbc.SQLServerDriver"
