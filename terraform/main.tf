@@ -24,7 +24,7 @@ module "sql" {
   source              = "./modules/sql"
   resource_group_name = azurerm_resource_group.rg.name
   location            = local.location
-  db_name             = "khalid_db"
+  db_name             = "khalid-db"
   admin_login         = var.admin_user
   admin_password      = var.admin_password
 
