@@ -11,7 +11,7 @@ spec:
   template:
     metadata:
       labels:
-        app: ecommerce-app-backend
+        app: burger-app-backend
     spec:
       containers:
       - image: khalidharbi/test-back-project2:latest
