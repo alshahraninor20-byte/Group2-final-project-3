@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-direct-ingress
+  namespace: project3
+spec:
+  podSelector:
+    matchLabels:
+      app: frontend-app
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector: {}
+          podSelector:
+            matchLabels:
+              # matches only Ingress controller pods
+              app.kubernetes.io/name: ingress-nginx
