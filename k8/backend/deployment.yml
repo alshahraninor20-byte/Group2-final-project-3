@@ -16,7 +16,12 @@ spec:
         app: backend
     spec:
       containers:
-      - image: ferhadmab/backend-burger-app:latest
-        name: backend-burger-app
-        resources: {}
+        - image: ferhadmab/backend-burger-app:latest
+          name: backend-burger-app
+          envFrom:
+            - configMapRef:
+                name: backend-config
+            - secretRef:
+                name: backend-secret
+          resources: {}
 status: {}
