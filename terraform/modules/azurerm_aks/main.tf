@@ -33,7 +33,6 @@ resource "azurerm_kubernetes_cluster" "aks" {
 resource "azurerm_kubernetes_cluster_node_pool" "user_pool" {
   name                  = "userpool"
   kubernetes_cluster_id = azurerm_kubernetes_cluster.aks.id
-  vnet_subnet_id = var.aks_subnet_id # assigning the node pool to a specific subnet
   vm_size               = var.vm_size
   auto_scaling_enabled = true
   node_count            = 1
