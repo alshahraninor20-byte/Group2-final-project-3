@@ -1,9 +1,6 @@
 name: Provision infra
 
 on:
-  pull_request:
-    branches:
-      - main
 
   workflow_dispatch:
 
@@ -63,17 +60,6 @@ jobs:
             --resource-group $(terraform output -raw rg) \
             --name $(terraform output -raw cluster_name) \
             --overwrite-existing
-
-      - name: Apply Prometheus ClusterRole
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: kubectl apply -f rbac-prometheus-clusterrole.yaml
-        working-directory: k8s
-
-      - name: Apply Prometheus ClusterRoleBinding
-        if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: kubectl apply -f rbac-prometheus-clusterrolebinding.yaml
-        working-directory: k8s
-
 
       - name: Verify kubectl connection
         if: ${{ github.event_name == 'workflow_dispatch' }}
