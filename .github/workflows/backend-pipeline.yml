@@ -1,0 +1,98 @@
+name: build and deploy backend
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: deploy backend
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Build backend
+        run: mvn clean package -DskipTests
+        working-directory: app/backend
+
+      - name: Run tests
+        run: mvn test
+        working-directory: app/backend
+
+      - name: Login to Azure
+        if: github.event_name == 'workflow_dispatch'
+        uses: azure/login@v2
+        with: 
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to Docker Hub
+        if: github.event_name == 'workflow_dispatch'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/app-backend
+          SHA_TAG=$(echo $GITHUB_SHA | cut -c1-7)
+          docker build -t $IMAGE_NAME:latest -t $IMAGE_NAME:$SHA_TAG .
+          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
+          echo "IMAGE_TAG=$SHA_TAG" >> $GITHUB_ENV
+        working-directory: app/backend
+
+      - name: Push Docker image
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          docker push ${{ env.IMAGE_NAME }}:latest
+          docker push ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+
+      - name: Set AKS context
+        if: github.event_name == 'workflow_dispatch'
+        run: az aks get-credentials --resource-group project3-group2 --name group2-cluster --overwrite-existing
+
+      - name: Verify cluster
+        if: github.event_name == 'workflow_dispatch'
+        run: kubectl get nodes
+
+      # - name: get ingress lb IP 
+      #   if: github.event_name == 'workflow_dispatch'
+      #   run: |
+      #     echo "INGRESS_LB_IP=$(kubectl get svc -n ingress-nginx | awk '{ print $4 }' | head -n 2 | tail -n 1)" >> $GITHUB_ENV
+
+      # - name: create ConfigMap for backend 
+      #   if: github.event_name == 'workflow_dispatch'
+      #   run: |
+      #     kubectl create -n project3 configmap dbconfig \
+      #       --from-literal=DB_NAME=${{  }} \
+      #       --from-literal=DB_SERVER=${{  }} \
+      #       --from-literal=DB_TRUST_SERVER_CERTIFICATE=${{  }} \
+      #       --from-literal=CORS_ORIGIN=http://$INGRESS_LB_IP \
+      #       --from-literal=DB_ENCRYPT=${{  }}
+
+      - name: create k8s secret for backend
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          kubectl create -n project3 secret generic my-secret \
+            --from-literal=DB_USER=${{ secrets.ADMIN_USER }} \
+            --from-literal=DB_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
+
+      - name: Update K8s deployment with SHA image
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          kubectl set image deployment/backend-deploy \
+            backend-deploy=${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} -n project3
+          kubectl rollout status deployment/backend-deploy -n project3
+        working-directory: k8s/backend
+
