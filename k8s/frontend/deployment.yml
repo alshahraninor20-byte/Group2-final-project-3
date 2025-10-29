@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: burger-app-frontend
+  namespace: project3
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: burger-app-frontend
+  template:
+    metadata:
+      labels:
+        app: burger-app-frontend
+    spec:
+      containers:
+      - image: khalidharbi/test-group2:latest
+        name: burger-app-frontend
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"

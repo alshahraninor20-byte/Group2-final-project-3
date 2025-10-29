@@ -1,0 +1,68 @@
+name: set k8s
+
+on:
+  workflow_dispatch:
+    
+jobs:
+  build:
+    name: set cluster 
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with: 
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set Terraform Azure credentials
+        run: |
+          echo "ARM_CLIENT_ID=${{ fromJson(secrets.AZURE_CREDENTIALS).clientId }}" >> $GITHUB_ENV
+          echo "ARM_CLIENT_SECRET=${{ fromJson(secrets.AZURE_CREDENTIALS).clientSecret }}" >> $GITHUB_ENV
+          echo "ARM_SUBSCRIPTION_ID=${{ fromJson(secrets.AZURE_CREDENTIALS).subscriptionId }}" >> $GITHUB_ENV
+          echo "ARM_TENANT_ID=${{ fromJson(secrets.AZURE_CREDENTIALS).tenantId }}" >> $GITHUB_ENV
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.0
+
+      - name: Initialize Terraform
+        run: terraform init
+        working-directory: terraform
+
+      - name: Get AKS credentials
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        working-directory: terraform
+        run: |
+          az aks get-credentials \
+            --resource-group $(terraform output -raw rg) \
+            --name $(terraform output -raw cluster_name) \
+            --overwrite-existing
+
+      - name: Verify kubectl connection
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: kubectl get nodes
+
+      - name: create namespace 
+        run: |
+          kubectl apply -f namespace.yml
+        working-directory: k8s
+
+      - name: deploy k8s backend
+        run: |
+          kubectl apply -f deployment.yml -f service.yml -f ingress.yml
+        working-directory: k8s/backend
+
+      - name: deploy k8s frontend
+        run: |
+          kubectl apply -f deployment.yml -f service.yml -f ingress.yml
+        working-directory: k8s/frontend
+
+      - name: get all 
+        run: kubectl get all -n project3
+
+      - name: get ingress IP
+        run: echo $INGRESS_LB_IP 
