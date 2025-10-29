@@ -37,7 +37,7 @@ module "pri" {
   db_name             = module.sql.db_name
   subnet_id           = module.subnets["db_subnet"].id
   vnet_id             = module.vnet.virtual_network_id
-  admin_login         = local.sql.admin_user
+  admin_login         = var.admin_user
   mssql_server        = lower(module.sql.mssql_server)
 }
 
