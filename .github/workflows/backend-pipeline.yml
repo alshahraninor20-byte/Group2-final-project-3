@@ -98,7 +98,8 @@ jobs:
           # Create Kubernetes secret
           kubectl create -n project3 secret generic my-secret \
             --from-literal=DB_USERNAME=$DB_USERNAME \
-            --from-literal=DB_PASSWORD=$DB_PASSWORD
+            --from-literal=DB_PASSWORD=$DB_PASSWORD \
+            --dry-run=client -o yaml | kubectl apply -f -
 
 
       - name: Update K8s deployment with SHA image
