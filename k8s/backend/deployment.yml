@@ -3,8 +3,15 @@ kind: Deployment
 metadata:
   name: burger-app-backend
   namespace: project3
+  labels:
+    app: burger-app-backend
 spec:
   replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
   selector:
     matchLabels:
       app: burger-app-backend
@@ -13,41 +20,42 @@ spec:
       labels:
         app: burger-app-backend
     spec:
+      serviceAccountName: backend-sa  # Apply least privilege 
       containers:
-      - name: burger-app-backend
-        image: khalidharbi/test-back-project2:latest
-        ports:
-          - containerPort: 8080
-        envFrom:
-          - configMapRef:
-              name: dbconfig         
-          - secretRef:
-              name: my-secret        
-        livenessProbe:
-          httpGet:
-            path: /actuator/health
-            port: 8080
-          initialDelaySeconds: 90
-          periodSeconds: 20
-          timeoutSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /actuator/health
-            port: 8080
-          initialDelaySeconds: 90
-          periodSeconds: 15
-          timeoutSeconds: 5
-          failureThreshold: 10
-        startupProbe:
-          httpGet:
-            path: /actuator/health
-            port: 8080
-          failureThreshold: 60
-          periodSeconds: 5
-        resources:
-          requests:
-            cpu: "100m"
-            memory: "128Mi"
-          limits:
-            cpu: "500m"
-            memory: "512Mi"
+        - name: burger-app-backend
+          image: khalidharbi/test-back-project2:latest 
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: dbconfig         
+            - secretRef:
+                name: my-secret        
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 90
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 90
+            periodSeconds: 20
+            timeoutSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            failureThreshold: 60
+            periodSeconds: 5
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
