@@ -83,7 +83,7 @@ jobs:
         run: |
           # Download remote Terraform state
           az storage blob download \
-            --account-name group2storagea3et6n \
+            --account-name prg3group2storagebghxu0 \
             --container-name tfstate \
             --name terraform.tfstate \
             --file tfstate.json
