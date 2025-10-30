@@ -1,0 +1,170 @@
+name: Provision infra
+
+on:
+
+  workflow_dispatch:
+
+env:
+  TF_WORKING_DIR: terraform
+  ARM_CLIENT_ID: ${{ fromJson(secrets.AZURE_CREDENTIALS).clientId }}
+  ARM_CLIENT_SECRET: ${{ fromJson(secrets.AZURE_CREDENTIALS).clientSecret }}
+  ARM_SUBSCRIPTION_ID: ${{ fromJson(secrets.AZURE_CREDENTIALS).subscriptionId }}
+  ARM_TENANT_ID: ${{ fromJson(secrets.AZURE_CREDENTIALS).tenantId }}
+
+jobs:
+  infra:
+    name: Provision AKS and Azure SQL
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ env.TF_WORKING_DIR }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.0
+
+      - name: Initialize Terraform
+        run: terraform init
+
+      - name: Validate configuration
+        run: terraform validate
+
+      - name: Plan the changes
+        env:
+          ADMIN_USER: ${{ secrets.ADMIN_USER }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+        run: |
+          terraform plan \
+            -var="admin_user=${{ secrets.ADMIN_USER }}" \
+            -var="admin_password=${{ secrets.ADMIN_PASSWORD }}" \
+            -out=tfplan
+
+      - name: Apply changes
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: terraform apply -auto-approve tfplan
+
+      - name: Get AKS credentials
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          az aks get-credentials \
+            --resource-group $(terraform output -raw rg) \
+            --name $(terraform output -raw cluster_name) \
+            --overwrite-existing
+
+      - name: Verify kubectl connection
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: kubectl get nodes
+
+      - name: Setup Helm
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        uses: azure/setup-helm@v4
+
+      - name: Install NGINX Ingress Controller
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+          helm repo update
+          helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
+            --namespace ingress-nginx \
+            --create-namespace \
+            --set controller.replicaCount=2 \
+            --set controller.nodeSelector."kubernetes\.io/os"=linux \
+            --set defaultBackend.nodeSelector."kubernetes\.io/os"=linux
+
+      - name: Install Prometheus Stack
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo update
+          helm upgrade --install prometheus prometheus-community/kube-prometheus-stack \
+            --namespace monitoring \
+            --create-namespace \
+            --set grafana.enabled=true \
+            --set grafana.service.type=LoadBalancer \
+            --set prometheus.prometheusSpec.serviceMonitorSelectorNilUsesHelmValues=false
+
+      - name: Install Loki Stack
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          helm repo add grafana https://grafana.github.io/helm-charts
+          helm repo update
+          helm upgrade --install loki grafana/loki-stack \
+            --namespace logging \
+            --create-namespace \
+            --set promtail.enabled=true \
+            --set grafana.enabled=false
+
+      - name: Wait for monitoring stacks to start
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          echo "Waiting 60s for Prometheus, Grafana, and Loki to start..."
+          sleep 60
+
+      - name: Add Loki Data Source to Grafana
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          GRAFANA_IP=$(kubectl get svc prometheus-grafana -n monitoring -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+          ADMIN_PASS=$(kubectl get secret prometheus-grafana -n monitoring -o jsonpath='{.data.admin-password}' | base64 --decode)
+
+          curl -s -X POST http://admin:$ADMIN_PASS@$GRAFANA_IP:80/api/datasources \
+            -H "Content-Type: application/json" \
+            -d '{
+              "name": "Loki",
+              "type": "loki",
+              "url": "http://loki.logging.svc.cluster.local:3100",
+              "access": "proxy",
+              "isDefault": true
+            }'
+
+      - name: Import Grafana Dashboards
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          GRAFANA_IP=$(kubectl get svc prometheus-grafana -n monitoring -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+          ADMIN_PASS=$(kubectl get secret prometheus-grafana -n monitoring -o jsonpath='{.data.admin-password}' | base64 --decode)
+
+          DASHBOARDS=(
+            "15760"  # k8s-views-pods
+            "15759"  # k8s-views-nodes
+            "15757"  # k8s-views-global
+            "15762"  # k8s-system-coredns
+            "15761"  # k8s-system-api-server
+            "15758"  # k8s-views-namespaces
+            "13639"  # k8s app logs
+          )
+
+          for DASH_ID in "${DASHBOARDS[@]}"; do
+            DASHBOARD_JSON=$(curl -s https://grafana.com/api/dashboards/$DASH_ID/revisions/1/download | \
+              sed 's/\${DS_PROMETHEUS}/Prometheus/g; s/\${DS_LOKI}/Loki/g')
+
+            curl -s -X POST http://admin:$ADMIN_PASS@$GRAFANA_IP:80/api/dashboards/db \
+              -H "Content-Type: application/json" \
+              -d "{
+                \"dashboard\": $DASHBOARD_JSON,
+                \"overwrite\": true
+              }"
+            echo "Imported dashboard ID $DASH_ID"
+          done
+        
+
+      - name: Show Grafana access details
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          echo " Retrieving Grafana Service Info..."
+          GRAFANA_IP=$(kubectl get svc prometheus-grafana -n monitoring -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+          ADMIN_USER="admin"
+          ADMIN_PASS=$(kubectl get secret prometheus-grafana -n monitoring -o jsonpath='{.data.admin-password}' | base64 --decode)
+          echo "--------------------------------------------------"
+          echo " Grafana URL: http://$GRAFANA_IP:80"
+          echo " Username: $ADMIN_USER"
+          echo " Password: $ADMIN_PASS"
+          echo "--------------------------------------------------"
