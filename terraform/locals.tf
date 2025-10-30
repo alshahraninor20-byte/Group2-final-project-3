@@ -1,7 +1,7 @@
 locals {
  resource_group_name = "prg3-group2"
   vnet_name           = "k"
-  location            = "UAE North"
+  location            = "West Europe"
   tags = {
     bootcamp = "devops-group2"
   }
@@ -19,3 +19,4 @@ locals {
 
 
 }
+
