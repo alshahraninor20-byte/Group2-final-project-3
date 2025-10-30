@@ -28,7 +28,7 @@ module "sql" {
   admin_login         = var.admin_user
   admin_password      = var.admin_password
   vnet_id = module.vnet.virtual_network_id
-  subnet_id = module.subnets.id
+  subnet_id           = module.subnets["db_subnet"].id
 }
 
 module "pri" {
