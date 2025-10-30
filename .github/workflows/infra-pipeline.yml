@@ -1,7 +1,6 @@
 name: Provision infra
 
 on:
-
   workflow_dispatch:
 
 env:
@@ -52,6 +51,12 @@ jobs:
       - name: Apply changes
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: terraform apply -auto-approve tfplan
+
+      - name: Set DB credentials in Key Vault
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          az keyvault secret set --vault-name $(terraform output -raw key_vault_name) --name "DB-Username" --value "${{ secrets.ADMIN_USER }}"
+          az keyvault secret set --vault-name $(terraform output -raw key_vault_name) --name "DB-Password" --value "${{ secrets.ADMIN_PASSWORD }}"  
 
       - name: Get AKS credentials
         if: ${{ github.event_name == 'workflow_dispatch' }}
