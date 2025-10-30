@@ -41,6 +41,14 @@ module "pri" {
   mssql_server        = lower(module.sql.mssql_server)
 }
 
+module "key_vault" {
+  source               = "./modules/azurerm_vault"
+  name                 = "group2-kv"
+  location             = local.location
+  resource_group_name  = module.resource_group.resource_group
+  subnet_ids           = [module.subnets["aks_subnet"].id]
+}
+
 module "aks" {
   source                 = "./modules/azurerm_aks"
   prefix                 = "group2-project"
