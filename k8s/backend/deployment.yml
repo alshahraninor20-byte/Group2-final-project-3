@@ -20,9 +20,9 @@ spec:
           - containerPort: 8080
         envFrom:
           - configMapRef:
-              name: dbconfig         # your ConfigMap with DB_HOST, DB_PORT, DB_NAME, DB_DRIVER
+              name: dbconfig         
           - secretRef:
-              name: my-secret        # secret with DB_USERNAME, DB_PASSWORD
+              name: my-secret        
         livenessProbe:
           httpGet:
             path: /actuator/health
