@@ -85,4 +85,5 @@ jobs:
 
       - name: Print ingress LB IP
         if: github.event_name == 'workflow_dispatch'
-        run: echo "Ingress LoadBalancer IP: $INGRESS_LB_IP"
+        run: |
+          echo "Ingress LoadBalancer IP: ${INGRESS_LB_IP}"
