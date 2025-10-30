@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dbconfig
+  namespace: project3
+data:
+  DB_HOST: group2-project3-db-sqlsrv-pr3-group2.database.windows.net
+  DB_PORT: "1433"
+  DB_NAME: "group2-project3-db"
+  DB_DRIVER: com.microsoft.sqlserver.jdbc.SQLServerDriver
