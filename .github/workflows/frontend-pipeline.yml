@@ -82,3 +82,8 @@ jobs:
             burger-app-frontend=${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} -n project3
           kubectl rollout status deployment/burger-app-frontend -n project3
         working-directory: k8s/frontend
+
+      - name: Print ingress LB IP
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          echo "Ingress LoadBalancer IP: ${INGRESS_LB_IP}"
