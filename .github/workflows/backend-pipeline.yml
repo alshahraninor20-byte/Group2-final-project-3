@@ -78,12 +78,28 @@ jobs:
       #       --from-literal=CORS_ORIGIN=http://$INGRESS_LB_IP \
       #       --from-literal=DB_ENCRYPT=${{  }}
 
-      - name: create k8s secret for backend
+      - name: Create K8s secret from Key Vault
         if: github.event_name == 'workflow_dispatch'
         run: |
+          # Download remote Terraform state
+          az storage blob download \
+            --account-name group2storagea3et6n \
+            --container-name tfstate \
+            --name terraform.tfstate \
+            --file tfstate.json
+
+          # Extract Key Vault name
+          KV_NAME=$(jq -r '.outputs.key_vault_name.value' tfstate.json)
+
+          # Fetch DB credentials from Key Vault
+          DB_USERNAME=$(az keyvault secret show --vault-name $KV_NAME --name "DB-Username" --query value -o tsv)
+          DB_PASSWORD=$(az keyvault secret show --vault-name $KV_NAME --name "DB-Password" --query value -o tsv)
+
+          # Create Kubernetes secret
           kubectl create -n project3 secret generic my-secret \
-            --from-literal=DB_USERNAME=${{ secrets.ADMIN_USER }} \
-            --from-literal=DB_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
+            --from-literal=DB_USERNAME=$DB_USERNAME \
+            --from-literal=DB_PASSWORD=$DB_PASSWORD
+
 
       - name: Update K8s deployment with SHA image
         if: github.event_name == 'workflow_dispatch'
