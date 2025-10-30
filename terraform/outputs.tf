@@ -25,6 +25,6 @@ output "rg" {
   value = azurerm_resource_group.rg.name  
 }
 
-# output "cluster_name" {
-#   value = module.aks.cluster_name
-# }
+ output "cluster_name" {
+   value = module.aks.cluster_name
+}
