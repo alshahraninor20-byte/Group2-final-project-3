@@ -36,9 +36,8 @@ spec:
               path: /actuator/health
               port: 8080
             initialDelaySeconds: 90
-            periodSeconds: 15
+            periodSeconds: 20
             timeoutSeconds: 5
-            failureThreshold: 10
           livenessProbe:
             httpGet:
               path: /actuator/health
@@ -50,8 +49,8 @@ spec:
             httpGet:
               path: /actuator/health
               port: 8080
-            failureThreshold: 60
-            periodSeconds: 5
+            failureThreshold: 30
+            periodSeconds: 10
           resources:
             requests:
               cpu: "100m"
