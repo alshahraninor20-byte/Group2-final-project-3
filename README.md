@@ -39,7 +39,7 @@ Key achievements:
 
 ---
 
-## 📁 Project Structure
+## 📁 **Project Structure**
 
 The following structure shows the main directories and files for the **AKS Migration Project**.  
 Each folder represents a major part of the DevOps workflow — app source code, Kubernetes manifests, Terraform IaC, and CI/CD automation.
@@ -100,6 +100,7 @@ terraform/                         # Infrastructure as Code (Terraform)
     ├── subnet/                    # Subnet configuration
     └── vnet/                      # Virtual Network module
 ```
+
 ---
 
 ## 🏗️ **Infrastructure Overview**
@@ -110,9 +111,7 @@ Our AKS migration adopts a **3-tier architecture** 🧱:
 | 🖥️ **AKS Cluster** | Hosts all containerized workloads (frontend + backend) |
 | 🗄️ **Azure SQL Database** | Secure data layer with private endpoint |
 | 🔒 **Azure Key Vault** | Secrets and credentials management |
-| 🌐 **Application Gateway (WAF v2)** | Ingress controller with TLS termination |
 | 🧩 **VNet + Subnets** | Isolated network environment |
-| 🐳 **Azure Container Registry (ACR)** | Stores Docker images |
 | 📊 **Prometheus + Grafana + Loki** | Cluster metrics, dashboards & logs |
 
 > Everything provisioned automatically via Terraform using remote state & OIDC authentication 🪄
@@ -120,35 +119,71 @@ Our AKS migration adopts a **3-tier architecture** 🧱:
 ---
 
 ## ⚙️ **Deployment Workflow**
-Our CI/CD pipelines are powered by **GitHub Actions**, ensuring consistency and automation at every layer 🧩
 
-### 🏗️ 1️⃣ Infrastructure Pipeline – `infra.yml`
-- 🔑 Authenticates to Azure using OIDC  
-- 🧱 Runs `terraform init → plan → apply`  
-- ☁️ Creates RG, VNet, Subnets, AKS, SQL, Key Vault and Monitoring stack  
+The deployment of the **Burger Builder App – AKS Migration Project** is fully automated using **GitHub Actions**.  
+The following pipelines ensure that each stage — infrastructure, backend, and frontend — is deployed consistently and securely to Azure.
 
-### 🧰 2️⃣ Backend Pipeline – `backend.yml`
-- 🧪 Builds Spring Boot app → Docker image  
-- 🐳 Pushes to Azure Container Registry  
-- 🚀 Deploys to AKS via `k8s/backend` manifests  
-- 🔐 Loads env vars from ConfigMaps/Secrets (never hardcoded)
+---
 
-### 💻 3️⃣ Frontend Pipeline – `frontend.yml`
-- ⚡ Builds React (Vite) app → container → ACR  
-- 🕸️ Deploys to AKS through Ingress controller  
-- 🌍 Exposed securely via Application Gateway (WAF v2)
+### 1️⃣ Infrastructure Pipeline – `infra.yml`
+- 🏗️ Provisions the entire cloud infrastructure using **Terraform**.  
+- Authenticates to Azure via OIDC (Service Principal).  
+- Runs `terraform init → plan → apply` to create:
+  - Resource Group, Virtual Network (VNet), and Subnets  
+  - Azure Kubernetes Service (AKS) Cluster  
+  - Azure SQL Database (Private Endpoint)  
+  - Azure Key Vault for secrets  
+  - Log Analytics, Prometheus, Grafana, and Loki  
+  - Application Gateway (WAF v2) for ingress routing  
+- ✅ Uses **Remote Backend (Azure Storage)** for Terraform state.
 
-> ⚠️ **Workflow Order:**  
-> 🏗️ Infra → 🧰 Backend → 💻 Frontend  
+---
+
+### 2️⃣ Backend Deployment Pipeline – `backend.yml`
+- 🧱 Builds and tests the **Spring Boot (Java 21)** backend.  
+- Containerizes the app with **Docker** and pushes to **Azure Container Registry (ACR)**.  
+- Deploys automatically to **AKS** using manifests under `k8s/backend/`.  
+- Uses **ConfigMaps** and **Secrets** for environment variables.  
+- Includes **readiness** and **liveness probes** for monitoring.  
+- 🔁 Supports rolling updates and auto-restart for failed pods.
+
+---
+
+### 3️⃣ Frontend Deployment Pipeline – `frontend.yml`
+- 💻 Builds and tests the **React + TypeScript (Vite)** frontend.  
+- Creates a Docker image and pushes it to **ACR**.  
+- Deploys to **AKS** using manifests under `k8s/frontend/`.  
+- Routed publicly via **Application Gateway (WAF v2)** with HTTPS.  
+- 🧩 Uses ConfigMaps for environment settings.
+
+---
+
+### ⚡ **Pipeline Order**
+Workflows are triggered manually from the **GitHub Actions** tab in this sequence:
+> **Infrastructure → Backend → Frontend**
+
+This ensures the infrastructure is provisioned before deploying applications.
+
+---
+
+### 🧩 **Summary**
+
+| Workflow File | Purpose | Tools Used |
+|----------------|----------|-------------|
+| `infra.yml` | Infrastructure provisioning | Terraform • Azure CLI |
+| `backend.yml` | Backend CI/CD | Maven • Docker • AKS |
+| `frontend.yml` | Frontend CI/CD | Node.js • Vite • AKS |
+
+> ⚙️ These pipelines ensure consistent, repeatable, and secure deployments across all environments 🚀
 
 ---
 
 ## 🧪 **Validation & Testing**
 After successful deployment ✅  
-- 🌐 Open the Application Gateway URL to verify frontend loads correctly  
-- 🔄 Test API endpoints through the gateway (proxy to backend)  
-- 📈 Check Grafana dashboards for pod metrics and HPA activity  
-- 📜 Review Loki logs for errors or performance issues  
+- 🌐 Access the Application Gateway URL to verify the frontend loads properly.  
+- 🔄 Test backend APIs through the gateway to ensure connectivity.  
+- 📈 Check **Grafana dashboards** for cluster metrics and HPA activity.  
+- 📜 Review **Loki logs** for errors and performance monitoring.
 
 ---
 
@@ -158,7 +193,4 @@ After successful deployment ✅
 - 🧩 **Khalid Alabdali**  
 - 🎨 **Thekra Alzahrani**  
 - 🔍 **Ahmed Basuwaiteen**
-
-
----
 
