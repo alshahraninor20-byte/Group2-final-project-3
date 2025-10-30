@@ -13,4 +13,5 @@ resource "azurerm_mssql_database" "db" {
   name           = "${var.db_name}-db"
   server_id      = azurerm_mssql_server.main.id
   sku_name       = "Basic"
+  storage_account_type = "Local"
 }

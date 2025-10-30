@@ -8,7 +8,7 @@ module "vnet" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = local.location
   address_space       = local.address_space
-  name = local.vnet_name
+  vnet_name           = local.vnet_name
 }
 
 module "subnets" {
@@ -28,7 +28,7 @@ module "sql" {
   admin_login         = var.admin_user
   admin_password      = var.admin_password
   vnet_id = module.vnet.virtual_network_id
-  subnet_id = module.subnets.id
+  subnet_id           = module.subnets["db_subnet"].id
 }
 
 module "pri" {
