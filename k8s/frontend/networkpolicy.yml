@@ -6,7 +6,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      app: frontend-app
+      app: burger-app-frontend
   policyTypes:
     - Ingress
   ingress:
