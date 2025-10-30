@@ -55,21 +55,26 @@ jobs:
           kubectl apply -f cm.yml -f deployment.yml -f service.yml -f ingress.yml
         working-directory: k8s/backend
 
+      - name: apply backend hpa
+        run: |
+          kubectl apply -f hpa.yml
+        working-directory: k8s/backend
       - name: deploy k8s frontend
         run: |
           kubectl apply -f deployment.yml -f service.yml -f ingress.yml
         working-directory: k8s/frontend
 
-      - name: wait for frontend pods to be ready
-        run: |
-          kubectl rollout status deployment/burger-app-frontend -n project3 --timeout=120s
-
-      - name: deploy frontend HPA
+      - name: apply frontend hpa
         run: |
           kubectl apply -f hpa.yml
         working-directory: k8s/frontend
-      - name: get all 
-        run: kubectl get all -n project3
+
+      - name: get all
+        run: |
+          kubectl get all -n project3
+      - name: verify hpa status
+        run: |
+          kubectl get hpa -n project3
 
       - name: get ingress IP
         run: echo $INGRESS_LB_IP 
