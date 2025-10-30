@@ -24,6 +24,8 @@ output "kv_uri" {
 output "key_vault_name" {
   description = "Key Vault name"
   value       = module.key_vault.key_vault_name
+}
+
 output "rg" {
   value = azurerm_resource_group.rg.name  
 }
