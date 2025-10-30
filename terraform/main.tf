@@ -8,7 +8,7 @@ module "vnet" {
   resource_group_name = azurerm_resource_group.rg.name
   location            = local.location
   address_space       = local.address_space
-  name = local.vnet_name
+  vnet_name           = local.vnet_name
 }
 
 module "subnets" {
