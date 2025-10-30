@@ -45,7 +45,7 @@ module "key_vault" {
   source               = "./modules/azurerm_vault"
   name                 = "group2-kv"
   location             = local.location
-  resource_group_name  = module.resource_group.resource_group
+  resource_group_name  = azurerm_resource_group.rg.name
   subnet_ids           = [module.subnets["aks_subnet"].id]
 }
 
@@ -58,3 +58,4 @@ module "aks" {
   vm_size                = "Standard_A2_v2"
   subnet                 = module.subnets["aks_subnet"].id
 }
+
