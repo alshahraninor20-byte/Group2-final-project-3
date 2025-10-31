@@ -27,7 +27,7 @@ module "sql" {
   db_name             = "group2-project3-db"
   admin_login         = var.admin_user
   admin_password      = var.admin_password
-  vnet_id = module.vnet.virtual_network_id
+  vnet_id             = module.vnet.virtual_network_id
   subnet_id           = module.subnets["db_subnet"].id
 }
 
@@ -47,7 +47,6 @@ module "key_vault" {
   name                 = "group2-kv-project3"
   location             = local.location
   resource_group_name  = azurerm_resource_group.rg.name
-  subnet_ids           = [module.subnets["aks_subnet"].id]
 }
 
 module "aks" {
@@ -56,7 +55,7 @@ module "aks" {
   location               = local.location
   resource_group_name    = azurerm_resource_group.rg.name
   default_node_pool_name = "kha"
-  vm_size                = "Standard_A2_v2"
+  vm_size                = "Standard_B2s"
   subnet                 = module.subnets["aks_subnet"].id
 }
 

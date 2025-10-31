@@ -19,9 +19,5 @@ variable "sku_name" {
   default     = "standard"
 }
 
-variable "subnet_ids" {
-  type        = list(string)
-  description = "Subnets allowed to access the vault"
-}
 
 
