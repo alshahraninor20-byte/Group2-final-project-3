@@ -11,6 +11,12 @@
 - [📬 Contact](#-contact)
 
 ---
+## 🖼️ **Project Documentation**
+
+For screenshots, system diagrams, and monitoring visuals, see the detailed documentation here:  
+👉 [**View Project Docs →**](./docs/README.md)
+
+---
 
 ## 🌐 **Overview**
 Welcome to our **final DevOps bootcamp project** 🎓  
