@@ -62,7 +62,7 @@ jobs:
         run: |
           IMAGE_NAME=${{ secrets.DOCKER_USERNAME }}/app-frontend
           SHA_TAG=$(echo $GITHUB_SHA | cut -c1-7)
-          docker build --build-arg VITE_API_BASE_URL=http://$INGRESS_LB_IP/api \
+          docker build  \
             -t $IMAGE_NAME:latest \
             -t $IMAGE_NAME:$SHA_TAG .
           echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
