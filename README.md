@@ -79,7 +79,6 @@ k8s/                               # Kubernetes manifests for AKS deployment
 │   └── service.yml                # Frontend Service definition
 │
 ├── namespace.yml                  # Namespace definition for project
-└── loki-fixed.json                # Loki configuration for log collection
 
 terraform/                         # Infrastructure as Code (Terraform)
 ├── main.tf                        # Root Terraform configuration
@@ -184,3 +183,4 @@ After successful deployment
 - **Khalid Alabdali**
 - **Thekra Alzahrani**
 - **Ahmed Basuwaiteen**
+
