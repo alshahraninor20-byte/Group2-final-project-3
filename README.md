@@ -50,7 +50,7 @@ The mission: build a **secure, scalable, automated** system.
     ├── infra.yml                  # CI/CD pipeline for infrastructure provisioning
     ├── backend.yml                # CI/CD pipeline for backend deployment
     └── frontend.yml               # CI/CD pipeline for frontend deployment
-    └── k8-pipline.yml              # CI/CD pipeline for k8 deployment
+    └── k8-pipline.yml             # CI/CD pipeline for k8 deployment
 
 app/
 ├── backend/                       # Spring Boot backend (Java 21)
